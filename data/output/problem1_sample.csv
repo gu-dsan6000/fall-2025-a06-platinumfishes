@@ -1,0 +1,11 @@
+value,log_level
+17/06/09 21:20:47 INFO storage.BlockManager: Found block rdd_2650_29 locally,INFO
+17/06/09 11:15:12 INFO executor.Executor: Running task 4.0 in stage 2604.0 (TID 104204),INFO
+"17/06/08 14:16:25 INFO python.PythonRunner: Times: total = 37, boot = 4, init = 33, finish = 0",INFO
+"17/06/09 16:45:14 INFO python.PythonRunner: Times: total = 37, boot = -10, init = 47, finish = 0",INFO
+17/06/09 17:13:50 INFO output.FileOutputCommitter: Saved output of task 'attempt_201706091713_1335_m_000036_54272' to hdfs://10.10.34.11:9000/pjhe/test/68/_temporary/0/task_201706091713_1335_m_000036,INFO
+"17/06/09 16:55:30 INFO python.PythonRunner: Times: total = 38, boot = 6, init = 32, finish = 0",INFO
+17/06/09 21:21:28 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1,INFO
+"17/06/09 21:13:06 INFO python.PythonRunner: Times: total = 40, boot = -14, init = 54, finish = 0",INFO
+"17/06/08 12:06:55 INFO python.PythonRunner: Times: total = 39, boot = 23, init = 16, finish = 0",INFO
+17/06/08 19:01:49 INFO executor.Executor: Finished task 29.0 in stage 301.0 (TID 12066). 2087 bytes result sent to driver,INFO
