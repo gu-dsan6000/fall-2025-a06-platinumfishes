@@ -70,23 +70,33 @@ def create_spark_session(master_url):
 
 
 def get_s3_paths(months_to_download):
-    """Generate S3 paths for NYC TLC data (cluster reads directly from S3)."""
+    """Use local parquet files if available, otherwise default to S3 paths."""
+    local_dir = "/home/ec2-user/fall-2025-a06-platinumfishes/data/raw"
 
-    logger.info(f"Preparing S3 paths for {len(months_to_download)} months of NYC TLC data")
-    print(f"\nPreparing to read {len(months_to_download)} months of NYC TLC data from S3...")
-    print("=" * 60)
+    # ✅ Check local directory first
+    if os.path.exists(local_dir):
+        local_files = sorted([
+            f"file://{os.path.join(local_dir, f)}"
+            for f in os.listdir(local_dir)
+            if f.endswith(".parquet")
+        ])
+        if local_files:
+            logger.info(f"✅ Found {len(local_files)} local parquet files in {local_dir}")
+            print(f"✅ Using {len(local_files)} local parquet files from {local_dir}")
+            # Return ONLY the local files (skip S3 completely)
+            return local_files
+        else:
+            logger.warning(f"No parquet files found in local dir {local_dir}, falling back to S3")
 
-    s3_paths = []
-
-    for month_num in months_to_download:
-        month_str = f"{month_num:02d}"
-        s3_path = f"s3a://bigdatateaching/nyc_tlc/trip_data/yyyy=2021/yellow_tripdata_2021-{month_str}.parquet"
-        s3_paths.append(s3_path)
-        print(f"  Month {month_str}/2021: {s3_path}")
-        logger.info(f"Added S3 path for month {month_str}: {s3_path}")
-
-    logger.info(f"Prepared {len(s3_paths)} S3 paths for direct reading")
-    print(f"\n✅ Prepared {len(s3_paths)} S3 paths - will read directly from S3")
+    # ❌ Fallback to S3 only if local not found
+    logger.info("Falling back to S3 (public teaching bucket)")
+    print("⚠️ No local files found — reading from S3A (requires credentials)")
+    s3_paths = [
+        f"s3a://bigdatateaching/nyc_tlc/trip_data/yyyy=2021/yellow_tripdata_2021-{month:02d}.parquet"
+        for month in months_to_download
+    ]
+    for path in s3_paths:
+        logger.info(f"Added S3 path: {path}")
     return s3_paths
 
 
@@ -258,9 +268,9 @@ def main():
     logger.info(f"Preparing S3 paths for {len(months_to_download)} months of data: {months_to_download}")
     data_files = get_s3_paths(months_to_download)
 
-    if len(data_files) == 0:
-        logger.error("No S3 paths available. Cannot proceed with analysis")
-        print("❌ No S3 paths available. Exiting...")
+    if not data_files:
+        logger.error("No data files found in local or S3 paths. Cannot proceed with analysis.")
+        print("❌ No data files found. Exiting...")
         spark.stop()
         return 1
 
